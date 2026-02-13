@@ -694,16 +694,15 @@ export class WDI5Control {
 
         // When the WebDriver protocol is not used, the domElement is not set accordingly (via devtool protocol)
         // Therefore we get element reference by calling browser execute function manually
-        if (_result.status === 0 && !_result?.domElement?.[ELEMENT_KEY]) {
+        // We also check for the BiDi element key "sharedId" and the WDIO-internal "elementId"
+        if (
+            _result.status === 0 &&
+            !_result?.domElement?.[ELEMENT_KEY] &&
+            !_result?.domElement?.["sharedId"] &&
+            !_result?.domElement?.["elementId"]
+        ) {
             const elementReference = (await this._browserInstance.execute((id) => {
-                const webElement: Node = document.evaluate(
-                    `//*[@id='${id}']`,
-                    document,
-                    null,
-                    XPathResult.FIRST_ORDERED_NODE_TYPE,
-                    null
-                ).singleNodeValue
-                return webElement
+                return document.getElementById(id)
             }, _result.id)) as unknown as WebdriverIO.Element
             _result.domElement = elementReference
         }
