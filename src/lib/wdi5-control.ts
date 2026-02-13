@@ -236,6 +236,10 @@ export class WDI5Control {
             logging = this._logging
         }
 
+        if (this._forceSelect) {
+            await this._renewWebElementReference()
+        }
+
         // when the interaction locator is existing we want to use the RecordReplay press (interactWithControl)
         if (controlSelector?.selector?.interaction) {
             if (logging) {
@@ -258,7 +262,11 @@ export class WDI5Control {
             try {
                 await ((await this._getWebElement()) as unknown as WebdriverIO.Element).click()
             } catch (error) {
-                if (logging) {
+                if (error.message.includes("stale element reference")) {
+                    Logger.debug("stale element reference during press(), retrying once...")
+                    await this.renewWebElementReference()
+                    await ((await this._getWebElement()) as unknown as WebdriverIO.Element).click()
+                } else if (logging) {
                     Logger.error(`cannot call press(), because ${error?.message}`)
                 }
             }
@@ -273,12 +281,30 @@ export class WDI5Control {
      * @param {any} oOptions
      * @param {WebdriverIO.Element} webElement
      */
-    async fireEvent(eventName: string, oOptions, webElement = this._webElement) {
+    async fireEvent(eventName: string, oOptions, webElement?: WebdriverIO.Element) {
         // Check the options have a eval property
         if (oOptions?.eval) {
             oOptions = "(" + oOptions.eval.toString() + ")"
         }
-        const result = await clientSide_fireEvent(webElement, eventName, oOptions, this._browserInstance)
+        if (this._forceSelect) {
+            this._webElement = await this._renewWebElementReference()
+            webElement = this._webElement
+        }
+        if (!webElement) {
+            webElement = this._webElement
+        }
+        let result
+        try {
+            result = await clientSide_fireEvent(webElement, eventName, oOptions, this._browserInstance)
+        } catch (error) {
+            if (error?.message?.includes("is stale") || error?.message?.includes("stale element reference")) {
+                Logger.debug(`stale element reference during fireEvent(${eventName}), retrying once...`)
+                webElement = await this._renewWebElementReference()
+                result = await clientSide_fireEvent(webElement, eventName, oOptions, this._browserInstance)
+            } else {
+                throw error
+            }
+        }
         if (this._logging) {
             this._writeObjectResultLog(result, "fireEvent()")
         }
@@ -342,7 +368,7 @@ export class WDI5Control {
                 throw Error("control could not be found")
             }
         }
-        if (!this._webdriverRepresentation) {
+        if (!this._webdriverRepresentation || this._forceSelect) {
             // to enable transition from wdi5 to wdio api in allControls
             await this._renewWebElement()
         }
@@ -443,7 +469,9 @@ export class WDI5Control {
         // check the validity of param
         if (sReplFunctionNames) {
             sReplFunctionNames.forEach(async (sMethodName) => {
-                this[sMethodName] = this._executeControlMethod.bind(this, sMethodName, this._webElement)
+                this[sMethodName] = async (...args) => {
+                    return await this._executeControlMethod(sMethodName, undefined, ...args)
+                }
             })
         } else {
             if (this._logging) {
@@ -456,8 +484,8 @@ export class WDI5Control {
         // check the validity of param
         if (sReplFunctionNames) {
             sReplFunctionNames.forEach(async (sMethodName) => {
-                this._wdioBridge[sMethodName] = async (): Promise<any> => {
-                    return await (await this.getWebElement())[sMethodName]()
+                this._wdioBridge[sMethodName] = async (...args): Promise<any> => {
+                    return await (await this.getWebElement())[sMethodName](...args)
                 }
             })
         } else {
@@ -474,15 +502,19 @@ export class WDI5Control {
      * @param webElement representation of selected UI5 control in wdio
      * @param args proxied arguments to UI5 control method at runtime
      */
-    private async _executeControlMethod(methodName: string, webElement = this._webElement, ...args) {
+    private async _executeControlMethod(methodName: string, webElement?: WebdriverIO.Element, ...args) {
         if (this._forceSelect) {
             try {
                 this._webElement = await this._renewWebElementReference()
+                webElement = this._webElement
             } catch (error) {
                 if (this._logging) {
                     Logger.error(`cannot execute ${methodName}(), because ${error?.message}`)
                 }
             }
+        }
+        if (!webElement) {
+            webElement = this._webElement
         }
         // special case for custom data attached to a UI5 control:
         // pass the arguments to the event handler (like UI5 handles and expects them) also
@@ -588,7 +620,7 @@ export class WDI5Control {
      * @throws will throw an error when no webElement was found
      * @return {any}
      */
-    private async _getAggregation(aggregationName: string, webElement = this._webElement) {
+    private async _getAggregation(aggregationName: string, webElement?: WebdriverIO.Element) {
         const _forceSelect: boolean = util.types.isProxy(this._forceSelect)
             ? await Promise.resolve(this._forceSelect)
             : this._forceSelect
@@ -598,15 +630,31 @@ export class WDI5Control {
             : this._logging
 
         if (_forceSelect) {
-            await this._renewWebElementReference()
+            this._webElement = await this._renewWebElementReference()
+            webElement = this._webElement
         }
+        if (!webElement) {
+            webElement = this._webElement
+        }
+
         if (util.types.isProxy(webElement)) {
             webElement = await Promise.resolve(webElement)
         }
         if (!webElement) {
             throw Error("control could not be found")
         }
-        const result = await clientSide_getAggregation(webElement, aggregationName, this._browserInstance)
+        let result
+        try {
+            result = await clientSide_getAggregation(webElement, aggregationName, this._browserInstance)
+        } catch (error) {
+            if (error?.message?.includes("is stale") || error?.message?.includes("stale element reference")) {
+                Logger.debug(`stale element reference during getAggregation(${aggregationName}), retrying once...`)
+                webElement = await this._renewWebElementReference()
+                result = await clientSide_getAggregation(webElement, aggregationName, this._browserInstance)
+            } else {
+                throw error
+            }
+        }
         if (_logging) {
             this._writeObjectResultLog(result, "_getAggregation()")
         }
@@ -721,7 +769,8 @@ export class WDI5Control {
             // set the successful init param
             this._initialisation = true
         } else {
-            this._initialisation = false
+            // note: we don't reset this._initialisation to false here
+            // to allow for temporary staleness/invisibility
             this._domId = undefined
         }
         if (this._logging) {

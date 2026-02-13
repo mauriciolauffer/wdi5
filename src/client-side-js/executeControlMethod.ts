@@ -170,20 +170,26 @@ async function clientSide_executeControlMethod(
     browserInstance: WebdriverIO.Browser,
     args: unknown[],
     wdi5Control: wdi5Control
-) {
-    let result: clientSide_ui5Response
+): Promise<clientSide_ui5Response> {
     try {
-        result = await executeControlMethod(webElement, methodName, browserInstance, args)
+        return await executeControlMethod(webElement, methodName, browserInstance, args)
     } catch (err) {
+        if (err?.message?.includes("is stale") || err?.message?.includes("stale element reference")) {
+            logger.debug(`stale element reference during ${methodName}, retrying once...`)
+            const renewedElement = await wdi5Control.renewWebElementReference()
+            if (renewedElement) {
+                return await executeControlMethod(renewedElement, methodName, browserInstance, args)
+            }
+        }
+        // original error handling
         logger.error("failed executing control method", methodName, err)
-        result = {
+        return {
             status: 1,
             message: `${methodName} could not be executed on control with selector: ${JSON.stringify(
                 wdi5Control._controlSelector
             )}`
         }
     }
-    return result
 }
 
 export { clientSide_executeControlMethod }
