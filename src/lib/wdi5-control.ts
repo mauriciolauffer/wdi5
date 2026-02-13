@@ -186,8 +186,12 @@ export class WDI5Control {
     /**
      * enters a text into a UI5 control
      * @param text
+     * @param oOptions options for the interaction
      */
-    async enterText(text: string) {
+    async enterText(
+        text: string,
+        oOptions?: { clearTextFirst?: boolean; pressEnterKey?: boolean; keepFocus?: boolean }
+    ) {
         let selector: wdi5ControlSelector
         let logging: boolean
         if (util.types.isProxy(this._controlSelector)) {
@@ -198,22 +202,31 @@ export class WDI5Control {
             selector = this._controlSelector?.selector
             logging = this._logging
         }
-        const oOptions: InteractWithControlOptions = {
+
+        const _oOptions: InteractWithControlOptions = {
             enterText: text,
             selector,
-            // @ts-expect-error: Property 'clearTextFirst' does not exist on type 'RecordReplay.InteractWithControlOptions'.
-            clearTextFirst: true,
+            clearTextFirst: oOptions?.clearTextFirst ?? true,
+            pressEnterKey: oOptions?.pressEnterKey ?? false,
+            keepFocus: oOptions?.keepFocus ?? false,
             // @ts-expect-error: Property 'ENTER_TEXT' does not exist on type 'RecordReplay.InteractionType'.
             interactionType: "ENTER_TEXT"
         }
         try {
-            await this._interactWithControl(oOptions)
+            await this._interactWithControl(_oOptions)
         } catch (error) {
             if (logging) {
                 Logger.error(`cannot call enterText(), because ${error?.message}`)
             }
         }
         return this
+    }
+
+    /**
+     * Presses the Enter key on a UI5 control
+     */
+    async pressEnterKey() {
+        return await this.enterText("", { clearTextFirst: false, pressEnterKey: true })
     }
 
     /**
