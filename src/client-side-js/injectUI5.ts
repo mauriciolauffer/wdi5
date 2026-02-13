@@ -5,6 +5,7 @@ import type BindingPath from "sap/ui/test/matchers/BindingPath"
 import type I18NText from "sap/ui/test/matchers/I18NText"
 import type Properties from "sap/ui/test/matchers/Properties"
 import type Ancestor from "sap/ui/test/matchers/Ancestor"
+import type Descendant from "sap/ui/test/matchers/Descendant"
 import type LabelFor from "sap/ui/test/matchers/LabelFor"
 import type UI5Element from "sap/ui/core/Element"
 import type { LibraryInfo } from "sap/ui/core/Core"
@@ -63,6 +64,7 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
                 I18NTextUi5LocalRef,
                 PropertiesUi5LocalRef,
                 AncestorUi5LocalRef,
+                DescendantUi5LocalRef,
                 LabelForUi5LocalRef,
                 UI5ElementRef,
                 VersionInfo
@@ -71,11 +73,12 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
                     Log,
                     typeof RecordReplay,
                     Control,
-                    BindingPath,
-                    I18NText,
-                    Properties,
-                    Ancestor,
-                    LabelFor,
+                    typeof BindingPath,
+                    typeof I18NText,
+                    typeof Properties,
+                    typeof Ancestor,
+                    typeof Descendant,
+                    typeof LabelFor,
                     UI5Element,
                     VersionInfo
                 ]
@@ -89,6 +92,7 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
                         "sap/ui/test/matchers/I18NText",
                         "sap/ui/test/matchers/Properties",
                         "sap/ui/test/matchers/Ancestor",
+                        "sap/ui/test/matchers/Descendant",
                         "sap/ui/test/matchers/LabelFor",
                         "sap/ui/core/Element",
                         "sap/ui/VersionInfo"
@@ -98,11 +102,12 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
                             Log,
                             typeof RecordReplay,
                             Control,
-                            BindingPath,
-                            I18NText,
-                            Properties,
-                            Ancestor,
-                            LabelFor,
+                            typeof BindingPath,
+                            typeof I18NText,
+                            typeof Properties,
+                            typeof Ancestor,
+                            typeof Descendant,
+                            typeof LabelFor,
                             UI5Element,
                             VersionInfo
                         ]
@@ -124,6 +129,12 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
             window.fe_bridge = {} // empty init for fiori elements test api
             window.wdi5.Log.info("[browser wdi5] APIs injected!")
             window.wdi5.isInitialized = true
+
+            // matchers
+            window.wdi5.matchers = {
+                Ancestor: AncestorUi5LocalRef,
+                Descendant: DescendantUi5LocalRef
+            }
 
             // make exec function available on all ui5 controls, so more complex evaluations can be done on browser side for better performance
             // @ts-expect-error: Property 'prototype' does not exist on type 'Control'
@@ -193,28 +204,23 @@ async function clientSide_injectUI5(waitForUI5Timeout: number, browserInstance: 
                     oSelector.matchers = []
                     // for version < 1.72 declarative matchers are not available
                     if (oSelector.bindingPath) {
-                        // @ts-expect-error: This expression is not constructable. Type has no construct signatures
-                        oSelector.matchers.push(new BindingPathUi5LocalRef(oSelector.bindingPath))
+                        oSelector.matchers.push(new BindingPathUi5LocalRef(oSelector.bindingPath) as any)
                         delete oSelector.bindingPath
                     }
                     if (oSelector.properties) {
-                        // @ts-expect-error: This expression is not constructable. Type has no construct signatures
-                        oSelector.matchers.push(new PropertiesUi5LocalRef(oSelector.properties))
+                        oSelector.matchers.push(new PropertiesUi5LocalRef(oSelector.properties) as any)
                         delete oSelector.properties
                     }
                     if (oSelector.i18NText) {
-                        // @ts-expect-error: This expression is not constructable. Type has no construct signatures
-                        oSelector.matchers.push(new I18NTextUi5LocalRef(oSelector.i18NText))
+                        oSelector.matchers.push(new I18NTextUi5LocalRef(oSelector.i18NText) as any)
                         delete oSelector.i18NText
                     }
                     if (oSelector.labelFor) {
-                        // @ts-expect-error: This expression is not constructable. Type has no construct signatures
-                        oSelector.matchers.push(new LabelForUi5LocalRef(oSelector.labelFor))
+                        oSelector.matchers.push(new LabelForUi5LocalRef(oSelector.labelFor) as any)
                         delete oSelector.labelFor
                     }
                     if (oSelector.ancestor) {
-                        // @ts-expect-error: This expression is not constructable. Type has no construct signatures
-                        oSelector.matchers.push(new AncestorUi5LocalRef(oSelector.ancestor))
+                        oSelector.matchers.push(new AncestorUi5LocalRef(oSelector.ancestor) as any)
                         delete oSelector.ancestor
                     }
                 }
