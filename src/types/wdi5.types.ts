@@ -277,9 +277,15 @@ export interface wdi5Bridge {
 
 export type ControlSelectorByDOMElementOptions = Parameters<typeof RecordReplay.findControlSelectorByDOMElement>["0"]
 
-type InteractWithControlParametersOmit = Omit<Parameters<typeof RecordReplay.interactWithControl>["0"], "selector">
+type InteractWithControlParametersOmit = Omit<
+    Parameters<typeof RecordReplay.interactWithControl>["0"],
+    "selector" | "clearTextFirst" | "pressEnterKey" | "keepFocus"
+>
 export type InteractWithControlOptions = InteractWithControlParametersOmit & {
     selector: Partial<ControlSelector>
+    clearTextFirst?: any
+    pressEnterKey?: any
+    keepFocus?: any
 }
 
 type ProxyMethodDetails = { name: string; accessor: boolean; args: any[] }

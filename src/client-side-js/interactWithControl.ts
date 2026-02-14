@@ -25,6 +25,7 @@ async function clientSide_interactWithControl(
         oOptions.selector = window.wdi5.createMatcher(oOptions.selector)
 
         try {
+            // @ts-expect-error: InteractWithControlOptions is not 100% compatible with RecordReplay.interactWithControl options
             const result = await window.bridge.interactWithControl(oOptions)
             window.wdi5.Log.info("[browser wdi5] interaction complete! - Message: " + result)
             return { status: 0, result }
