@@ -1,56 +1,96 @@
-import type { wdi5Selector, clientSide_ui5Response } from "../types/wdi5.types.js"
+import { wdi5Selector, clientSide_ui5Response } from "../types/wdi5.types.js"
 
-async function clientSide_getControl(
+/**
+ * extracts a UI5 control from the browser context
+ * @param controlSelector
+ * @param browserInstance
+ */
+export async function clientSide_getControl(
     controlSelector: wdi5Selector,
     browserInstance: WebdriverIO.Browser
 ): Promise<clientSide_ui5Response> {
-    controlSelector = await Promise.resolve(controlSelector) // to plug into fluent async api
-    return await browserInstance.execute(async function wdi5_getControl(controlSelector) {
-        if (!window.wdi5 || !window.bridge) {
-            // Local checkForWdi5BrowserReady.js for better performance
-            const wdi5MissingErr = new Error(
-                `WDI5 is not available in the browser context! window.wdi5: ${!!window.wdi5} | window.bridge: ${!!window.bridge}`
-            )
-            console.error(wdi5MissingErr) // eslint-disable-line no-console
-            throw wdi5MissingErr
-        }
-        const waitForUI5Options = Object.assign({}, window.wdi5.waitForUI5Options)
-        if (controlSelector.timeout) {
-            waitForUI5Options.timeout = controlSelector.timeout
-        }
-        // skip waitForUI5 (only used internally!)
-        if (!controlSelector._skipWaitForUI5) {
-            try {
-                await window.bridge.waitForUI5(waitForUI5Options)
-            } catch (error) {
-                return window.wdi5.errorHandling(error)
-            }
-        }
-
-        window.wdi5.Log.info("[browser wdi5] locating " + JSON.stringify(controlSelector))
-        controlSelector.selector = window.wdi5.createMatcher(controlSelector.selector)
-        let domElement
-
+    return await browserInstance.execute(async (controlSelector) => {
         try {
-            // @ts-expect-error: Property 'findDOMElementByControlSelector' does not exist on type 'RecordReplay'
-            domElement = await window.bridge.findDOMElementByControlSelector(controlSelector)
+            if (controlSelector._skipWaitForUI5 !== true) {
+                const waitOptions = {
+                    timeout: controlSelector.timeout || window.wdi5.waitForUI5Options.timeout,
+                    interval: window.wdi5.waitForUI5Options.interval
+                }
+                await window.bridge.waitForUI5(waitOptions)
+            }
+
+            const selector = window.wdi5.createMatcher(controlSelector.selector)
+
+            // manual resolution of ancestor and descendant
+            // to avoid issues with declarative resolution in some UI5 versions/environments
+            const resolveToControl = async (subSelector) => {
+                if (
+                    subSelector &&
+                    typeof subSelector === "object" &&
+                    !(subSelector instanceof (sap.ui as any).core.Control)
+                ) {
+                    const dom = await (window.bridge as any).findDOMElementByControlSelector({ selector: subSelector })
+                    if (dom && !(dom instanceof Error)) {
+                        return window.wdi5.getUI5CtlForWebObj(dom as HTMLElement)
+                    }
+                }
+                return subSelector
+            }
+
+            if (selector.ancestor) {
+                const control = await resolveToControl(selector.ancestor)
+                if (control) {
+                    const Ancestor = window.wdi5.matchers.Ancestor
+                    selector.matchers = selector.matchers || []
+                    ;(selector.matchers as any[]).push(new Ancestor(control))
+                    delete selector.ancestor
+                }
+            }
+
+            if (selector.descendant) {
+                const control = await resolveToControl(selector.descendant)
+                if (control) {
+                    const Descendant = window.wdi5.matchers.Descendant
+                    selector.matchers = selector.matchers || []
+                    ;(selector.matchers as any[]).push(new Descendant(control))
+                    delete selector.descendant
+                }
+            }
+
+            // we use a custom replacer to avoid circular structure issues when logging
+            // especially when the selector now contains UI5 control instances
+            if (controlSelector.logging !== false) {
+                window.wdi5.Log.info(
+                    `[browser wdi5] locating control using: ${JSON.stringify(
+                        selector,
+                        window.wdi5.getCircularReplacer()
+                    )}`
+                )
+            }
+
+            const dom = await (window.bridge as any).findDOMElementByControlSelector({
+                selector
+            })
+            if (dom && !(dom instanceof Error)) {
+                const ui5Control = window.wdi5.getUI5CtlForWebObj(dom as HTMLElement)
+                const id = ui5Control.getId()
+                const className = ui5Control.getMetadata().getName()
+                const aProtoFunctions = window.wdi5.retrieveControlMethods(ui5Control)
+                return {
+                    status: 0,
+                    id,
+                    className,
+                    aProtoFunctions,
+                    domElement: dom as WebdriverIO.Element
+                }
+            }
+            return {
+                status: 1,
+                message: dom?.toString() || "Unknown error in findDOMElementByControlSelector",
+                result: dom
+            }
         } catch (error) {
             return window.wdi5.errorHandling(error)
         }
-
-        const ui5Control = window.wdi5.getUI5CtlForWebObj(domElement)
-        const id = ui5Control.getId()
-        const className = ui5Control.getMetadata().getName()
-        window.wdi5.Log.info(`[browser wdi5] control with id: ${id} located!`)
-        const aProtoFunctions = window.wdi5.retrieveControlMethods(ui5Control)
-        return {
-            status: 0,
-            domElement: domElement,
-            id: id,
-            aProtoFunctions: aProtoFunctions,
-            className: className
-        }
     }, controlSelector)
 }
-
-export { clientSide_getControl }

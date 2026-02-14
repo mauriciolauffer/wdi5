@@ -12,6 +12,8 @@ import type { $AggregationContainsPropertyEqualSettings } from "sap/ui/test/matc
 import type { ControlsBaseSelector } from "sap/ui/test/Opa5"
 import type { ControlSelector } from "sap/ui/test/RecordReplay"
 import type Control from "sap/ui/core/Control"
+import type Ancestor from "sap/ui/test/matchers/Ancestor"
+import type Descendant from "sap/ui/test/matchers/Descendant"
 import type ListReport from "sap/fe/test/ListReport"
 import type ObjectPage from "sap/fe/test/ObjectPage"
 import type Shell from "sap/fe/test/Shell"
@@ -272,6 +274,10 @@ export interface wdi5Bridge {
         getCircularReplacer: () => (key: string, value: any) => any
         removeEmptyElements: (object: any, i?: number) => any
         errorHandling: (error: any, reject?: any) => { status: wdi5StatusCode; message: string }
+        matchers: {
+            Ancestor: typeof Ancestor
+            Descendant: typeof Descendant
+        }
     }
 }
 
