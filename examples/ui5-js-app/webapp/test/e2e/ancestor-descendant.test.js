@@ -7,6 +7,7 @@ describe("ancestor and descendant selector resolution", () => {
 
     it("should find a control using an ancestor selector (asControl)", async () => {
         const selector = {
+            wdio_ui5_key: "titleWithAncestor",
             selector: {
                 controlType: "sap.m.Title",
                 ancestor: {
