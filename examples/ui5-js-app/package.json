@@ -14,6 +14,7 @@
     "test:webserver": "wait-on tcp:8081 -t 15s && wdio run webapp/test/wdio-webserver.conf.js --headless",
     "test:multiremote": "wait-on tcp:8081 -t 15s && wdio run webapp/test/wdio-multiremote.conf.js --headless",
     "test:urlDeprecation": "wait-on tcp:8081 -t 15s && wdio run webapp/test/wdi5-urlDeprecation.conf.js --headless",
+    "test:allControls": "wait-on tcp:8081 -t 15s && wdio run webapp/test/wdio-ui5tooling.conf.js --spec webapp/test/e2e/allControls-interaction.test.js --headless",
     "start:test": "run-p -r start test"
   },
   "devDependencies": {
