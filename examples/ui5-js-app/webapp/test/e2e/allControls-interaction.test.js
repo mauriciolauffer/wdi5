@@ -17,14 +17,7 @@ describe("allControls interaction", () => {
         const buttons = await browser.allControls(selector)
         // Find the button with a specific ID among all buttons
 
-        let targetButton
-        for (const btn of buttons) {
-            const id = await btn.getId()
-            if (id.includes("idIaSync")) {
-                targetButton = btn
-                break
-            }
-        }
+        const targetButton = buttons.find((btn) => btn.getControlInfo().id.includes("idIaSync"))
 
         expect(targetButton).toBeDefined()
         // The fix ensures that .press() uses the specific ID of this control instance
