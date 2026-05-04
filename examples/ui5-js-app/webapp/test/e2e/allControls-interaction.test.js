@@ -40,14 +40,7 @@ describe("allControls interaction", () => {
         }
 
         const inputs = await browser.allControls(selector)
-        let targetInput
-        for (const input of inputs) {
-            const id = await input.getId()
-            if (id.includes("mainUserInput")) {
-                targetInput = input
-                break
-            }
-        }
+        const targetInput = inputs.find((input) => input.getControlInfo().id.includes("mainUserInput"))
 
         expect(targetInput).toBeDefined()
         const testText = "Typed from allControls"
