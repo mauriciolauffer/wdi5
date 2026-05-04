@@ -17,7 +17,14 @@ describe("allControls interaction", () => {
         const buttons = await browser.allControls(selector)
         // Find the button with a specific ID among all buttons
 
-        const targetButton = buttons.find((btn) => btn.getControlInfo().id.includes("idIaSync"))
+        let targetButton
+        for (const btn of buttons) {
+            const id = await btn.getId()
+            if (id.includes("idIaSync")) {
+                targetButton = btn
+                break
+            }
+        }
 
         expect(targetButton).toBeDefined()
         // The fix ensures that .press() uses the specific ID of this control instance
@@ -40,7 +47,14 @@ describe("allControls interaction", () => {
         }
 
         const inputs = await browser.allControls(selector)
-        const targetInput = inputs.find((input) => input.getControlInfo().id.includes("mainUserInput"))
+        let targetInput
+        for (const input of inputs) {
+            const id = await input.getId()
+            if (id.includes("mainUserInput")) {
+                targetInput = input
+                break
+            }
+        }
 
         expect(targetInput).toBeDefined()
         const testText = "Typed from allControls"
