@@ -200,7 +200,10 @@ export class WDI5Control {
         }
         const oOptions: InteractWithControlOptions = {
             enterText: text,
-            selector,
+            selector: {
+                ...selector,
+                id: this._domId
+            },
             // @ts-expect-error: Property 'clearTextFirst' does not exist on type 'RecordReplay.InteractWithControlOptions'.
             clearTextFirst: true,
             // @ts-expect-error: Property 'ENTER_TEXT' does not exist on type 'RecordReplay.InteractionType'.
@@ -242,7 +245,10 @@ export class WDI5Control {
                 Logger.info(`using OPA5 Press action to interact with this ${className}...`)
             }
             const oOptions: InteractWithControlOptions = {
-                selector: controlSelector.selector,
+                selector: {
+                    ...controlSelector.selector,
+                    id: this._domId
+                },
                 // @ts-expect-error: Property 'PRESS' does not exist on type 'RecordReplay.InteractionType'.
                 interactionType: "PRESS"
             }
@@ -341,6 +347,9 @@ export class WDI5Control {
             } else {
                 throw Error("control could not be found")
             }
+        }
+        if (!this._webdriverRepresentation && this._webElement) {
+            this._webdriverRepresentation = this._webElement as unknown as WebdriverIO.Element
         }
         if (!this._webdriverRepresentation) {
             // to enable transition from wdi5 to wdio api in allControls
