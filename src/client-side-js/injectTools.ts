@@ -17,8 +17,6 @@ async function clientSide_injectTools(browserInstance: WebdriverIO.Browser) {
         } else {
             // eval() is bad, but it's coming from a trusted source, it's better than manually copying the code
             eval(compareVersionsStringfied)
-            // @ts-expect-error: compareVersions is not defined in the browser context (yet)
-            window.compareVersions = compareVersions
         }
         if (!window.compareVersions) {
             throw new Error("compare-versions library could not be injected into the browser context")
