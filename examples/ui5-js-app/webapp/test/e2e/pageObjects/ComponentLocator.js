@@ -1,53 +1,47 @@
 const { wdi5 } = require("wdio-ui5-service")
 const Page = require("./Page")
 
-// const planningCalendarRow = {
-//     selector: {
-//         controlType: "sap.m.internal.PlanningCalendarRowListItem",
-//         id: /__row0-__xmlview0--schedulePlanningCalendar-0-CLI$/
-//     }
-// }
-
 class ComponentLocator extends Page {
-    async open(path) {
-        wdi5.goTo(path)
-    }
+    _viewName = "test.Sample.view.Calendar"
 
     async open() {
         await super.open(`#/Calendar`)
     }
 
-    async getShowButton() {
-        const showSummary = {
-            selector: {
-                controlType: "sap.m.Button",
-                id: /TodayBtn$/
-            }
-        }
-
-        return await browser.asControl(showSummary)
-    }
-
-    async getCloseSummaryButton() {
-        const closeSummary = {
-            selector: {
-                controlType: "sap.m.Button",
-                id: /closeSummaryButton$/
-            }
-        }
-
-        return await browser.asControl(closeSummary)
-    }
-
     async getPlanningCalendar() {
-        const planningCalendar = {
+        return await browser.asControl({
             selector: {
                 controlType: "sap.m.PlanningCalendar",
                 id: /PC1/
             }
-        }
+        })
+    }
 
-        return await browser.asControl(planningCalendar)
+    async getTodayButton() {
+        return await browser.asControl({
+            selector: {
+                controlType: "sap.m.Button",
+                id: /TodayBtn$/
+            }
+        })
+    }
+
+    async getCloseSummaryButton() {
+        return await browser.asControl({
+            selector: {
+                controlType: "sap.m.Button",
+                id: /closeSummaryButton$/
+            }
+        })
+    }
+
+    async getViewsMultiComboBox() {
+        return await browser.asControl({
+            selector: {
+                controlType: "sap.m.MultiComboBox",
+                viewName: this._viewName
+            }
+        })
     }
 }
 

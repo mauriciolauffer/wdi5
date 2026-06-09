@@ -18,17 +18,24 @@ class Other extends Page {
         await super.open(`#/Other`)
     }
 
+    async getPage() {
+        return await browser.asControl({
+            selector: {
+                id: "OtherPage",
+                viewName: this._viewName
+            }
+        })
+    }
+
     async getList(force = false) {
-        const listSelector = {
+        return await browser.asControl({
             wdio_ui5_key: "PeopleList",
+            forceSelect: force,
             selector: {
                 id: "PeopleList",
                 viewName: this._viewName
-            },
-            forceSelect: force //> this will populate down to $ui5Control.getAggregation and $ui5Control.getProperty as well
-        }
-
-        return await browser.asControl(listSelector)
+            }
+        })
     }
 
     async getListItems(force = false) {
@@ -36,10 +43,48 @@ class Other extends Page {
         return await list.getAggregation("items")
     }
 
-    async getAddLineItemButtom() {
+    async getTextFieldClickResult() {
+        return await browser.asControl({
+            selector: {
+                id: "idTextFieldClickResult",
+                viewName: this._viewName
+            }
+        })
+    }
+
+    async getAddLineItemButton() {
         return await browser.asControl({
             selector: {
                 id: "idAddLineItemButton",
+                viewName: this._viewName
+            }
+        })
+    }
+
+    // keep typo'd name for backward compatibility with existing tests
+    async getAddLineItemButtom() {
+        return await this.getAddLineItemButton()
+    }
+
+    async getPeopleListSelect() {
+        return await browser.asControl({
+            selector: {
+                id: "PeopleListSelect",
+                viewName: this._viewName
+            }
+        })
+    }
+
+    async getPeopleListSelectItems(force = false) {
+        const list = await this.getPeopleListSelect()
+        return await list.getAggregation("items")
+    }
+
+    async getAllCheckboxes(force = false) {
+        return await browser.allControls({
+            forceSelect: force,
+            selector: {
+                controlType: "sap.m.CheckBox",
                 viewName: this._viewName
             }
         })
