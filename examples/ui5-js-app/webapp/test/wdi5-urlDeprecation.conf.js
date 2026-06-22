@@ -1,13 +1,10 @@
-const { baseConfig } = require("./wdio.base.conf")
+import { baseConfig, reusableTestScriptsPath } from "./wdio.base.conf.cjs"
 
-const _config = {
-    // check that the url property still works even though it is deprecated
+export const config = {
+    ...baseConfig,
     wdi5: {
         url: "#"
     },
-    specs: ["e2e/**/hash-nav.test.js"],
-    exclude: ["e2e/ui5-late.test.js", "e2e/multiremote.test.js"],
-    baseUrl: "http://localhost:8081/index.html"
+    specs: [`${reusableTestScriptsPath}/**/hash-nav.test.cjs`],
+    exclude: [`${reusableTestScriptsPath}/ui5-late.test.cjs`, `${reusableTestScriptsPath}/multiremote.test.cjs`]
 }
-
-exports.config = { ...baseConfig, ..._config }

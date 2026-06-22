@@ -79,8 +79,9 @@ describe("ui5 object tests", () => {
 
         await wdi5.goTo({ sHash: "#/Other" })
 
-        const table = (await Other.getList(true)) as unknown as List
-        const firstItem = await table.getItems()[0] // CHANGED
+        const table = await Other.getList(true)
+        // @ts-expect-error
+        const firstItem = await table.getItems(0)
         const itemContext = await firstItem.getBindingContext()
         const myObject = await itemContext.getObject()
 

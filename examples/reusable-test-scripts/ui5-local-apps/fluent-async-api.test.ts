@@ -23,10 +23,11 @@ describe("async api", () => {
             const list: List = await browser[test.api](listSelector)
             wdi5.getLogger().info("//> ********************")
             wdi5.getLogger().info("//> done with sap.m.List")
-            const listItem = await list.getItems()[0] // ui5 api // CHANGED
+            // @ts-expect-error
+            const listItem: StandardListItem = await list.getItems(1) // ui5 api
             wdi5.getLogger().info("//> ********************")
             wdi5.getLogger().info("//> done with List Item")
-            const title = await (listItem as StandardListItem).getTitle() // ui5 api
+            const title = await listItem.getTitle() // ui5 api
             wdi5.getLogger().info("//> ********************")
             wdi5.getLogger().info("//> done with sap.m.Title")
             expect(title).toBe("Andrew Fuller")

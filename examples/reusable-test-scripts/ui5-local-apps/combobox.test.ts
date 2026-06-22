@@ -30,7 +30,8 @@ describe("ui5 sap.m.Combobox", () => {
         await combobox.open()
 
         const items = await combobox.getItems()
-        expect(await items[4].getText()).toEqual("Bahrain")
+        // @ts-expect-error
+        expect(await items[4].getTitle()).toEqual("Bahrain")
     })
 
     it("get combobox items aggregation as ui5 items", async () => {
@@ -39,6 +40,7 @@ describe("ui5 sap.m.Combobox", () => {
         await combobox.open()
 
         const items = await combobox.getItems()
-        expect(await items[4].getText()).toEqual("Bahrain")
+        // @ts-expect-error
+        expect(await items[4].getTitle()).toEqual("Bahrain")
     })
 })

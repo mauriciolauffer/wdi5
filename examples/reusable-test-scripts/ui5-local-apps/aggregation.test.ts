@@ -1,6 +1,7 @@
 import type Button from "sap/m/Button"
 import type List from "sap/m/List"
 import type StandardListItem from "sap/m/StandardListItem"
+import type ManagedObject from "sap/ui/base/ManagedObject"
 import type Page from "sap/m/Page"
 import Other from "./pageObjects/Other.js"
 
@@ -15,13 +16,14 @@ describe("ui5 aggregation retrieval", () => {
 
     it("check the getBinding of a table", async () => {
         const mytable = await Other.getList()
-        const firstrow = await (mytable as unknown as List).getItems()[0] // CHANGED
+        // @ts-expect-error
+        const firstrow = await mytable.getItems(0)
         const rowcontext = await firstrow.getBindingContext()
         const myobject = await rowcontext.getObject()
         expect(myobject.FirstName).toEqual("Nancy")
     })
 
-    it.only("select controls of a sap.m.Page's content aggregation", async () => {
+    it("select controls of a sap.m.Page's content aggregation", async () => {
         // goal: assert that .getContent() and .getAggregation("items") work the same
         // including access via the fluent async api
         const pageSelector = {
@@ -39,16 +41,15 @@ describe("ui5 aggregation retrieval", () => {
         expect(content.length).toBe(3)
 
         // shorthand getContent($atIndex)
-        const firstContentItem = await page.getContent()[0] // CHANGED
+        const firstContentItem = content[0]
         const listId = await firstContentItem.getId()
-        const secondContentItem = await page.getContent()[1] // CHANGED
+        const secondContentItem = content[1]
         const vboxId = await secondContentItem.getId()
         expect(listId).toContain("PeopleList")
         expect(vboxId).toContain("VBoxx")
 
         // regular getAggregation($name)
-        const aggregation = await page.getAggregation("content")
-        // @ts-expect-error: Property 'length' does not exist on type 'ManagedObject'
+        const aggregation = (await page.getAggregation("content")) as ManagedObject[]
         expect(aggregation.length).toBe(3)
 
         const listIdViaAggregationItem = await aggregation[0].getId()
@@ -58,7 +59,7 @@ describe("ui5 aggregation retrieval", () => {
 
         // test shorthand with fluent async api
         // @ts-expect-error
-        const listIdViaFluentApi = await browser.asControl(pageSelector).getContent(0)[0].getId()
+        const listIdViaFluentApi = await browser.asControl(pageSelector).getContent(0).getId()
         expect(listIdViaFluentApi).toContain("PeopleList")
         // @ts-expect-error
         const vboxItemsViaFluentApi = await browser.asControl(pageSelector).getContent(1).getItems()
@@ -75,9 +76,8 @@ describe("ui5 aggregation retrieval", () => {
         expect(items.length).toEqual(9)
         // loop though controls and validate entries (bound in the app view "Other")
         for (const listItem of items) {
-            await expect(
-                Other.allNames.find(async (name) => (await listItem.getProperty("title")) === name)
-            ).toBeTruthy()
+            const title = await listItem.getProperty("title")
+            expect(Other.allNames.find(async (name) => title === name)).toBeTruthy()
         }
     })
 

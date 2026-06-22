@@ -3,9 +3,21 @@ import tseslint from "typescript-eslint"
 import { defineConfig } from "eslint/config"
 import js from "@eslint/js"
 import { configs as wdioConfigs } from "eslint-plugin-wdio"
+import mochaPlugin from "eslint-plugin-mocha"
+
 export default defineConfig([
     {
-        ignores: ["esm/", "cjs/", "dist/", "node_modules/", "docker/", "docs/", "examples/"]
+        ignores: [
+            "esm/",
+            "cjs/",
+            "dist/",
+            "node_modules/",
+            "docker/",
+            "docs/",
+            "examples/*",
+            "examples/reusable-test-scripts/dist/"
+            // "!examples/reusable-test-scripts/"
+        ]
     },
     {
         languageOptions: {
@@ -24,11 +36,14 @@ export default defineConfig([
         }
     },
     {
-        files: ["test/**/*"],
-        extends: [wdioConfigs["flat/recommended"]]
+        files: ["examples/reusable-test-scripts/**/*"],
+        extends: [wdioConfigs["flat/recommended"], mochaPlugin.configs.recommended],
+        rules: {
+            "mocha/no-mocha-arrows": "off"
+        }
     },
     {
-        files: ["client-side-js/**/*", "commitlint.config.cjs"],
+        files: ["commitlint.config.cjs"],
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "commonjs",
