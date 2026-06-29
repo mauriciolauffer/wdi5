@@ -334,3 +334,4 @@ declare global {
 }
 
 export type { WDI5Control as wdi5Control } from "../lib/wdi5-control.js"
+export type { WDI5FE } from "../lib/wdi5-fe.js"
