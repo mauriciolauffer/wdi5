@@ -11,4 +11,5 @@
 - [Test Library Integration](fe-testlib.md)
 - [Docker](docker.md)
 - [Contributing](contributing.md)
+- [Test Structure](test-structure.md)
 - [Resources](resources.md)

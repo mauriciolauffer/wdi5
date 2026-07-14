@@ -1,23 +1,22 @@
 
 # base image
-FROM node:14-alpine3.14
+FROM node:24-alpine
 
 RUN apk update \
-    && apk upgrade
+    && apk upgrade \
+    && rm -rf /var/cache/apk/*
 
 # set working directory
 WORKDIR /app
 
-# COPY all to root
-COPY ../docker/package-wdi5.json package.json
-COPY ../examples/ui5-js-app/webapp/test test
-COPY ../examples/ui5-js-app/e2e-test-config/wdio-docker-selenium.conf.js wdio-docker-selenium.conf.js
-COPY ../examples/ui5-js-app/e2e-test-config/wdio.base.conf.js wdio.base.conf.js
-
-COPY ../ wdio-ui5-service
+COPY docker/package-wdi5.json package.json
+COPY examples/ui5-js-app/webapp/test test
+COPY examples/reusable-test-scripts/dist/esm/ui5-local-apps test/e2e
+COPY docker/e2e-test-config e2e-test-config
+COPY . wdio-ui5-service
 
 RUN mkdir -p report/screenshots
 
 RUN npm install
 
-CMD node_modules/.bin/wait-on tcp:selenium-hub:4444 && npm run test:docker:selenium
+CMD ["sh", "-c", "node_modules/.bin/wait-on tcp:selenium-hub:4444 && npm run test:docker:selenium"]

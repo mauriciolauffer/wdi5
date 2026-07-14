@@ -1,30 +1,29 @@
 # base image
-## pass this via docker build --build-arg node_version=17
+## pass this via docker build --build-arg node_version=22
 ARG node_version=22
-FROM node:${node_version}-bullseye-slim
+FROM node:${node_version}-bookworm-slim
 
-# basic tools
-RUN apt update
-RUN apt install -yq libgconf-2-4 gnupg2 wget ca-certificates lsb-release software-properties-common vim procps
-# install google chrome
-RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-RUN wget -O- https://dl.google.com/linux/linux_signing_key.pub |gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg
-RUN apt update
-RUN apt install -y google-chrome-stable --no-install-recommends
-# install git
-# see #599 https://github.com/ui5-community/wdi5/issues/599
-RUN apt install -y git
+# basic tools + google chrome + git
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+    libgconf-2-4 gnupg2 wget ca-certificates lsb-release \
+    software-properties-common vim procps git \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && wget -O- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
 # copy sample app to /app
-COPY ./examples/ui5-js-app/webapp/ webapp
+COPY ./examples/ui5-js-app/webapp webapp
 COPY ./examples/ui5-js-app/scripts scripts
 COPY ./examples/ui5-js-app/ui5.yaml ui5.yaml
+COPY ./examples/reusable-test-scripts/dist/esm/ui5-local-apps webapp/test/e2e
 COPY ./docker/package-standalone.json package.json
 # this is the standard file and allows for a simple call like "wdio"
-COPY ./examples/ui5-js-app/webapp/test/wdio-docker-standalone.conf.js wdio.conf.js
-COPY ./examples/ui5-js-app/webapp/test/wdio.base.conf.js wdio.base.conf.js
+COPY ./docker/e2e-test-config e2e-test-config
 RUN mkdir -p report/screenshots
 
 # install basic setup:
