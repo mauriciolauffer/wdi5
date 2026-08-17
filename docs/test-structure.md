@@ -49,6 +49,7 @@ The root `package.json` has dedicated entries that start the webserver and run t
 | ------------------------- | ------------------------ |
 | `npm run test:ui5:app:v1` | `examples/ui5-js-app`    |
 | `npm run test:ui5:app:v2` | `examples/ui5-v2-js-app` |
+| `npm run test:ui5:app:ts` | `examples/ui5-ts-app`    |
 
 These are equivalent to running `npm run start:test` inside the respective workspace.
 

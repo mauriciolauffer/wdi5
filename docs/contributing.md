@@ -132,7 +132,7 @@ $> npm run start -w examples/ui5-js-app
 $> npm run start -w examples/ui5-v2-js-app
 
 # UI5 v1, TypeScript app (port 8083)
-$> npm run start -w examples/ui5-ts-app-NEW
+$> npm run start -w examples/ui5-ts-app
 ```
 
 **3. Run a single test file** in terminal 2:
@@ -147,6 +147,7 @@ $> npm run test:webserver -w ui5-js-app -- --spec basic.test.cjs --watch
 ```shell
 $> npm run test:ui5:app:v1   # ui5-js-app
 $> npm run test:ui5:app:v2   # ui5-v2-js-app
+$> npm run test:ui5:app:ts   # ui5-ts-app
 ```
 
 ?> when working on tests and you don't seem to be getting the latest `wdi5` changes,  
