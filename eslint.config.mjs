@@ -12,7 +12,6 @@ export default defineConfig([
             "cjs/",
             "dist/",
             "node_modules/",
-            "docker/",
             "docs/",
             "examples/*",
             "examples/reusable-test-scripts/dist/"
