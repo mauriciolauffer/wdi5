@@ -1,3 +1,5 @@
+// Import/require to test whether ESM/CJS modules are working as expected
+import _wdi5 from "wdio-ui5-service"
 import { baseConfig } from "../wdio.root-base.conf.cjs"
 
 export const config = {
