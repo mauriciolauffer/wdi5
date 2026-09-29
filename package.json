@@ -112,9 +112,9 @@
     "soerver": "^0.0.3",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
-    "tsdown": "^0.22.14",
-    "tsx": "^4.22.4",
-    "typescript": "^5.9.3",
+    "tsdown": "^0.23.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
     "wait-on": "^9.0.10"
   },
@@ -129,5 +129,8 @@
   "engines": {
     "node": ">=20",
     "npm": ">=10"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
