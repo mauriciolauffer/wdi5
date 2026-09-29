@@ -1,6 +1,6 @@
-import { baseConfig, reusableTestScriptsPath } from "./wdio.base.conf.cjs"
+const { baseConfig, reusableTestScriptsPath } = require("./wdio.base.conf.cjs")
 
-export const config = {
+exports.config = {
     ...baseConfig,
     wdi5: {
         url: "#"

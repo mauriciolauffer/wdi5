@@ -1,6 +1,12 @@
 import { mock } from "node:test"
 import _ui5Service from "wdio-ui5-service"
-const ui5Service = new _ui5Service()
+
+/**
+ * The tsdown generated .cjs test files expects require("wdio-ui5-service").default.
+ * Files .ts and .js are fine.
+ */
+// @ts-expect-error: Property 'default' does not exist on type 'typeof Service'.
+const ui5Service = typeof _ui5Service?.default === "function" ? new _ui5Service.default() : new _ui5Service()
 
 /**
  * All tests have the same setup and initial assertions
