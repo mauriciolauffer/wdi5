@@ -61,9 +61,7 @@ describe("test suite description", () => {
   })
 
   it("should do this", async () => {
-    const selector = {
-      /* ... */
-    }
+    const selector = {/* ... */}
     const prop = await browser.asControl(selector).getProperty("...")
     expect(prop).toEqual("...")
   })
@@ -84,9 +82,7 @@ describe("test suite description", () => {
   })
 
   it("should do this", async () => {
-    const selector = {
-      /* ... */
-    }
+    const selector = {/* ... */}
     const prop = await browser.asControl(selector).getProperty("...")
     expect(prop).toEqual("...")
   })
@@ -108,9 +104,7 @@ describe("test suite description", () => {
   })
 
   it("should do this", async () => {
-    const selector: wdi5Selector = {
-      /* ... */
-    }
+    const selector: wdi5Selector = {/* ... */}
     const prop: string = await browser.asControl(selector).getProperty("...")
     expect(prop).toEqual("...")
   })

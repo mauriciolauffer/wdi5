@@ -164,8 +164,7 @@ export interface wdi5ControlSelector extends ControlsBaseSelector {
     aggregationFilled?: $AggregationFilledSettings
     aggregationEmpty?: $AggregationEmptySettings
     aggregationContainsPropertyEqual?:
-        | $AggregationContainsPropertyEqualSettings
-        | $AggregationContainsPropertyEqualSettings[]
+        $AggregationContainsPropertyEqualSettings | $AggregationContainsPropertyEqualSettings[]
     /**
      * interaction adapter
      */
