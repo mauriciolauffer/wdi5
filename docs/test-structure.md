@@ -12,11 +12,11 @@ These scripts are written in TypeScript and compiled to both **CJS** (`dist/cjs`
 
 ### Example apps
 
-| App                      | UI5 version | Module format | Test file extension | Port |
-| ------------------------ | ----------- | ------------- | ------------------- | ---- |
-| `examples/ui5-js-app`    | v1.\*       | CJS           | `.cjs`              | 8081 |
-| `examples/ui5-v2-js-app` | v2.\*       | ESM           | `.js`               | 8082 |
-| `examples/ui5-ts-app`    | v1.\*       | TypeScript    | `.ts`               | 8083 |
+| App                       | UI5 version | Module format | Test file extension | Port |
+| ------------------------- | ----------- | ------------- | ------------------- | ---- |
+| `examples/ui5-js-app`     | v1.\*       | CJS           | `.cjs`              | 8081 |
+| `examples/ui5-v2-js-app`  | v2.\*       | ESM           | `.js`               | 8082 |
+| `examples/ui5-ts-app-NEW` | v1.\*       | TypeScript    | `.ts`               | 8083 |
 
 ---
 
@@ -37,7 +37,7 @@ This removes any previous output and compiles the TypeScript sources to both tar
 - `examples/reusable-test-scripts/dist/cjs/` — for `ui5-js-app`
 - `examples/reusable-test-scripts/dist/esm/` — for `ui5-v2-js-app`
 
-`ui5-ts-app` consumes the sources directly, so no compiled output is needed for it.
+`ui5-ts-app-NEW` consumes the sources directly, so no compiled output is needed for it.
 
 > The build step is required once per checkout and after any change to files under `examples/reusable-test-scripts/`.
 
@@ -45,11 +45,11 @@ This removes any previous output and compiles the TypeScript sources to both tar
 
 The root `package.json` has dedicated entries that start the webserver and run the full test suite for each app:
 
-| Root script               | App                      |
-| ------------------------- | ------------------------ |
-| `npm run test:ui5:app:v1` | `examples/ui5-js-app`    |
-| `npm run test:ui5:app:v2` | `examples/ui5-v2-js-app` |
-| `npm run test:ui5:app:ts` | `examples/ui5-ts-app`    |
+| Root script               | App                       |
+| ------------------------- | ------------------------- |
+| `npm run test:ui5:app:v1` | `examples/ui5-js-app`     |
+| `npm run test:ui5:app:v2` | `examples/ui5-v2-js-app`  |
+| `npm run test:ui5:app:ts` | `examples/ui5-ts-app-NEW` |
 
 These are equivalent to running `npm run start:test` inside the respective workspace.
 
@@ -111,7 +111,7 @@ All `.test.ts` files here are the **single source** consumed by all three apps. 
 
 - `dist/cjs/` — consumed by `ui5-js-app` (CJS, `.test.cjs`)
 - `dist/esm/` — consumed by `ui5-v2-js-app` (ESM, `.test.js`)
-- directly as TypeScript — consumed by `ui5-ts-app` (`.test.ts`)
+- directly as TypeScript — consumed by `ui5-ts-app-NEW` (`.test.ts`)
 
 ### Test files
 
@@ -136,7 +136,7 @@ Every app's `wdio.base.conf.*` must import and spread it:
 const { baseConfig: rootBaseConfig } = require("../../../wdio.root-base.conf.cjs")
 exports.baseConfig = { ...rootBaseConfig, baseUrl: "http://localhost:8081/index.html" }
 
-// ESM (ui5-v2-js-app / ui5-ts-app)
+// ESM (ui5-v2-js-app / ui5-ts-app-NEW)
 import { baseConfig as rootBaseConfig } from "../../../wdio.root-base.conf.cjs"
 export const baseConfig = { ...rootBaseConfig, baseUrl: "http://localhost:8083/index.html" }
 ```
@@ -170,4 +170,4 @@ Do not copy common compiler options into the per-app tsconfig — keep the inher
 | `wdio-multiremote.conf.*`    | Multi-browser (multiremote) session                          |
 | `wdi5-urlDeprecation.conf.*` | Validates deprecated URL-based wdi5 configuration            |
 
-The file extension matches the app's module format: `.cjs` for `ui5-js-app`, `.js` for `ui5-v2-js-app`, and `.ts` for `ui5-ts-app`.
+The file extension matches the app's module format: `.cjs` for `ui5-js-app`, `.js` for `ui5-v2-js-app`, and `.ts` for `ui5-ts-app-NEW`.
