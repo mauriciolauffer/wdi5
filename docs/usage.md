@@ -308,7 +308,7 @@ This is possible because of a runtime proxy `wdi5` provides that transistions th
 
 ```zsh
 # terminal 1: run webapp on port 8888
-$> npx soerver -d <path/to/webapp> -p 8888
+$> npx ui5 serve -p 8888
 
 # terminal 2: run test
 $> npx wdio run <path/to/conf> --spec <path/to/test>
