@@ -72,7 +72,6 @@ describe("wdio bridge", () => {
     })
 
     it("should be Webdriver Classic or BiDi", () => {
-        // @ts-expect-error
         const isClassic = !!browser.options?.capabilities["wdio:enforceWebDriverClassic"]
         // If it's Webdriver Classic, isBiDi has to be false
         expect(!isClassic).toBe(!!browser?.isBidi)

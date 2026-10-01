@@ -1,4 +1,4 @@
-const { cpus } = require("node:os")
+const { cpus, tmpdir } = require("node:os")
 const maxInstances = Math.max(1, Math.floor(cpus().length / 2))
 const isDebug = !!process.argv.includes("--debug")
 const isHeadless = !!process.argv.includes("--headless")
@@ -14,6 +14,7 @@ if (isDebug) {
 exports.baseConfig = {
     wdi5: {
         logLevel: "error",
+        screenshotPath: tmpdir(),
         waitForUI5Timeout: 29000
     },
     maxInstances: maxInstances,
